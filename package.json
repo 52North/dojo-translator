@@ -1,0 +1,42 @@
+{
+  "name": "translator",
+  "version": "1.0.0",
+  "description": "map.apps translator",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/52North/ec-odp-mapapps",
+  "repository" :  {
+    "type" : "git",
+    "url" : "https://github.com/52North/ec-odp-mapapps.git"
+  },
+  "bugs": {
+    "url": "https://github.com/52North/ec-odp-mapapps/issues"
+  },
+  "author": {
+    "name": "Christian Autermann",
+    "github": "https://github.com/autermann",
+    "email": "c.autermann@52north.org"
+  },
+  "contributors": [
+    {
+      "name": "Christian Autermann",
+      "github": "https://github.com/autermann",
+      "email": "c.autermann@52north.org"
+    }
+  ],
+  "directories": {
+    "doc": "./doc",
+    "man": "./man",
+    "lib": "./lib",
+    "bin": "./bin"
+  },
+  "main": "./lib/index.js",
+  "bin": {
+    "translator": "./bin/translator.js"
+  },
+  "dependencies": {
+    "promise": "~6.1.0",
+    "cli": "~0.6.5",
+    "colors": "~0.6.2",
+    "mkdirp": "~0.5.0"
+  }
+}
