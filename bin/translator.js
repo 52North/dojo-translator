@@ -3,104 +3,72 @@
 var cli = require('cli');
 var NLSReader = require('../lib/nls/reader');
 var NLSWriter = require('../lib/nls/writer');
+var Translator = require('../lib/translator');
+var util = require('util');
+
+
+
+var langs = [
+  'bg', 'cs', 'da', 'de',
+  'el', 'en', 'es', 'et',
+  'fi', 'fr', 'ga', 'hr',
+  'hu', 'it', 'lt', 'lv',
+  'mt', 'nl', 'pl', 'pt',
+  'ro', 'sk', 'sl', 'sv'
+];
 
 cli.enable('help', 'glob');
 cli.parse({
   baseDir: [ 'd', 'map.apps directory', 'path', '../_map.apps-3.1.0/ct-mapapps-js-api-3.1.0-src' ],
   target: [ 't', 'target directory', 'path', './out' ],
-  bundle: [ 'b', 'Bundle name (optional)', 'string', null ]
-}, [ 'read', 'translate' , 'write']);
-
-cli.main(function() {
-  var options = this.options;
-  var nls;
-  switch (this.command) {
-    case 'read':
-      if (options.baseDir) {
-        nls = new NLSReader({
-          baseDir: options.baseDir,
-          bundle: options.bundle
-        }).parse().done(function(x) {
-          /*
-          x.map(function(x) {
-            return x.hasPlaceholders();
-          });
-          */
-          console.log(JSON.stringify(x, null, 2));
-        });
-      } else {
-        cli.getUsage(1);
-      }
-    break;
-    case 'write':
-      if (options.baseDir) {
-        nls = new NLSReader({
-          baseDir: options.baseDir,
-          bundle: options.bundle
-        }).parse().done(function(x) {
-          var writer = new NLSWriter();
-          x.forEach(function(x) {
-            writer.writeBundle(options.target, x);
-          });
-        });
-      } else {
-        cli.getUsage(1);
-      }
-    break;
-  }
+  bundle: [ 'b', 'Bundle name (optional)', 'string', null ],
+  targetLang: [ 'l', 'Target language', 'string', langs.filter(function(x) { return x !== 'en' && x !==  'de'; }) ],
+  sourceLang: [ null, 'Source language', 'string', 'en'],
+  apikey: [ 'k', 'Google Cloud Platform API key', 'string', null ],
+  noop: [ 'n', 'Do not acutally execute requests' ]
 });
 
 
+function read(options) {
+  if (options.baseDir) {
+    return new NLSReader({
+      baseDir: options.baseDir,
+      bundle: options.bundle
+    }).parse();
+  } else {
+    return cli.getUsage(1);
+  }
+}
 
-const langs = [
-'bg', 'cs', 'da', 'de',
-'el', 'en', 'es', 'et',
-'fi', 'fr', 'ga', 'hr',
-'hu', 'it', 'lt', 'lv',
-'mt', 'nl', 'pl', 'pt',
-'ro', 'sk', 'sl', 'sv'
-];
+function writer(options) {
+  return function(bundles) {
+    var writer = new NLSWriter();
+    bundles.forEach(function(bundle) {
+      writer.writeBundle(options.target, bundle);
+    });
+  };
+}
 
-
-
-
-
-
-
-/*
-nls.then(function(x) {
-    var chars = x.map(function(x) {
-      return countCharacters(x.lang.en);
-    }).reduce(function(x,v) {
-      return v + x;
-    }, 0);
-    console.log(chars + ' characters per language');
-    console.log(chars * langs.length - 2 + ' for all languages');
-    return x;
+function translator(options) {
+  var t = new Translator({
+    key: options.apikey,
+    sourceLang: options.sourceLang,
+    noop: options.noop
   });
+  if (!options.targetLang) cli.getUsage(1);
+  if (!util.isArray(options.targetLang)) {
+    options.targetLang = [options.targetLang];
+  }
+  return function(bundles) {
+    return Promise.all(bundles.map(function(bundle) {
+      return Promise.all(options.targetLang.map(function(targetLang) {
+        return t.translate(bundle, targetLang);
+      }));
+    })).then(function() { return bundles; });
+  };
+}
 
-nls.then(function(x) {
-    return x.map(function(x) {
-      return toArray(x.lang.en);
-    }).reduce(function(prev, curr) {
-      return prev.concat(curr);
-    }, []);
-  })
-  .then(sort)
-  .then(function(x) {
-    console.log(x.length + ' strings');
-    return x;
-  })
-  .then(unique)
-  .then(function(x) {
-    console.log(x.length + ' strings');
-    console.log(x);
-    return x;
-  })
-  .then(countStringArrayCharacters)
-  .done(function(chars) {
-    console.log(chars + ' characters per language');
-    console.log(chars * langs.length - 2 + ' for ' + (langs.length - 2) + ' languages');
-
-  });
-*/
+cli.main(function() {
+  var options = this.options;
+  read(options).then(translator(options)).done(writer(options));
+});
