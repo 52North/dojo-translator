@@ -29,12 +29,13 @@ cli.parse({
 });
 
 
-function read(options) {
+function reader(options) {
   if (options.baseDir) {
-    return new NLSReader({
+    var r = new NLSReader({
       baseDir: options.baseDir,
       bundle: options.bundle
-    }).parse();
+    });
+    return function() { return r.parse(); };
   } else {
     return cli.getUsage(1);
   }
@@ -70,5 +71,14 @@ function translator(options) {
 
 cli.main(function() {
   var options = this.options;
-  read(options).then(translator(options)).done(writer(options));
+  var t, w, r;
+  try {
+    t = translator(options);
+    w = writer(options);
+    r = reader(options);
+  } catch (e) {
+    console.error(e.toString().red);
+    return cli.getUsage(1);
+  }
+  r().then(t).done(w);
 });
