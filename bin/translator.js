@@ -47,6 +47,7 @@ function writer(options) {
     bundles.forEach(function(bundle) {
       writer.writeBundle(options.target, bundle);
     });
+    return bundles;
   };
 }
 
