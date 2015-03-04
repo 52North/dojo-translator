@@ -25,65 +25,47 @@ cli.parse({
   targetLang: [ 'l', 'Target language', 'string', langs.filter(function(x) { return x !== 'en' && x !==  'de'; }) ],
   sourceLang: [ null, 'Source language', 'string', 'en'],
   apikey: [ 'k', 'Google Cloud Platform API key', 'string', null ],
-  noop: [ 'n', 'Do not acutally execute requests' ]
+  noop: [ 'n', 'Do not acutally execute requests' ],
+  concurrency: [ 'c', 'Concurrency level', 'int', 20 ]
 });
 
 
-function reader(options) {
-  if (options.baseDir) {
-    var r = new NLSReader({
-      baseDir: options.baseDir,
-      bundle: options.bundle
-    });
-    return function() { return r.parse(); };
-  } else {
-    return cli.getUsage(1);
-  }
-}
-
-function writer(options) {
-  return function(bundles) {
-    var writer = new NLSWriter();
-    bundles.forEach(function(bundle) {
-      writer.writeBundle(options.target, bundle);
-    });
-    return bundles;
-  };
-}
-
-function translator(options) {
-  var t = new Translator({
-    key: options.apikey,
-    sourceLang: options.sourceLang,
-    noop: options.noop
-  });
-  if (!options.targetLang) cli.getUsage(1);
-  if (!util.isArray(options.targetLang)) {
-    options.targetLang = [options.targetLang];
-  }
-  return function(bundles) {
-    return Promise.all(bundles.map(function(bundle) {
-      return Promise.all(options.targetLang.map(function(targetLang) {
-        return t.translate(bundle, targetLang);
-      }));
-    })).then(function() { return bundles; });
-  };
-}
-
 cli.main(function() {
   var options = this.options;
+  if (!options.targetLang) cli.getUsage(1);
   if (!util.isArray(options.targetLang)) {
     options.targetLang = options.targetLang.split(",")
         .map(function(x) { return x.trim(); });
   }
+
   var t, w, r;
   try {
-    t = translator(options);
-    w = writer(options);
-    r = reader(options);
+    r = new NLSReader({
+      baseDir: options.baseDir,
+      bundle: options.bundle
+    });
+    t = new Translator({
+      key: options.apikey,
+      sourceLang: options.sourceLang,
+      noop: options.noop,
+      concurrency: options.concurrency
+    });
+    w = new NLSWriter({
+      target: options.target
+    });
   } catch (e) {
     console.error(e.toString().red);
     return cli.getUsage(1);
   }
-  r().then(t).done(w);
+  r.parse()
+    .then(function(bundles) {
+      options.targetLang.forEach(function(lang) {
+        bundles.forEach(function(bundle) {
+          t.translate(bundle, lang);
+        });
+      });
+      return bundles;
+    }).then(function(bundles) {
+      w.writeBundle(bundles);
+    }).done();
 });
