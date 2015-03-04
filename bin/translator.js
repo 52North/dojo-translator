@@ -72,6 +72,10 @@ function translator(options) {
 
 cli.main(function() {
   var options = this.options;
+  if (!util.isArray(options.targetLang)) {
+    options.targetLang = options.targetLang.split(",")
+        .map(function(x) { return x.trim(); });
+  }
   var t, w, r;
   try {
     t = translator(options);
