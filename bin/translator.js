@@ -5,6 +5,7 @@ var NLSReader = require('../lib/nls/reader');
 var NLSWriter = require('../lib/nls/writer');
 var Translator = require('../lib/translator');
 var util = require('util');
+var Promise = require('bluebird');
 
 
 
@@ -59,12 +60,7 @@ cli.main(function() {
   }
   r.parse()
     .then(function(bundles) {
-      options.targetLang.forEach(function(lang) {
-        bundles.forEach(function(bundle) {
-          t.translate(bundle, lang);
-        });
-      });
-      return bundles;
+      return t.translate(bundles, options.targetLang);
     }).then(function(bundles) {
       w.writeBundle(bundles);
     }).done();
