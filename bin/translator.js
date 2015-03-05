@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
 var cli = require('cli');
+var util = require('util');
+
 var NLSReader = require('../lib/nls/reader');
 var NLSWriter = require('../lib/nls/writer');
 var Translator = require('../lib/translator');
-var util = require('util');
-var Promise = require('bluebird');
-
-
 
 var langs = [
   'bg', 'cs', 'da', 'de',
@@ -59,9 +57,7 @@ cli.main(function() {
     return cli.getUsage(1);
   }
   r.parse()
-    .then(function(bundles) {
-      return t.translate(bundles, options.targetLang);
-    }).then(function(bundles) {
-      w.writeBundle(bundles);
-    }).done();
+    .then(function(bundles) { return t.translate(bundles, options.targetLang); })
+    .then(function(bundles) { return w.writeBundle(bundles); })
+    .done();
 });
