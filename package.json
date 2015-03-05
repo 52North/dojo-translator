@@ -31,7 +31,8 @@
   },
   "main": "./lib/index.js",
   "bin": {
-    "translator": "./bin/translator.js"
+    "translator": "./bin/translator.js",
+    "postprocess": "./bin/postprocess.js"
   },
   "dependencies": {
     "bluebird": "~2.9.13",
