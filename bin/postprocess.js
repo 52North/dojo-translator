@@ -26,8 +26,7 @@ cli.parse({
 });
 
 
-cli.main(function() {
-  var options = this.options;
+cli.main(function(args, options) {
   var t, w, r;
   try {
     r = new NLSReader({

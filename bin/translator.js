@@ -29,8 +29,7 @@ cli.parse({
 });
 
 
-cli.main(function() {
-  var options = this.options;
+cli.main(function(args, options) {
   if (!options.targetLang) cli.getUsage(1);
   if (!util.isArray(options.targetLang)) {
     options.targetLang = options.targetLang.split(",")
