@@ -21,7 +21,8 @@ cli.parse({
   baseDir: [ 'd', 'map.apps directory', 'path', '../_map.apps-3.1.0/ct-mapapps-js-api-3.1.0-src' ],
   target: [ 't', 'target directory', 'path', './pp_out' ],
   bundle: [ 'b', 'Bundle name (optional)', 'string', null ],
-  referenceLang: [ null, 'Reference language', 'string', 'en']
+  referenceLang: [ null, 'Reference language', 'string', 'en'],
+  interactive: [ 'i', 'Interactivly edit translations' ]
 });
 
 
@@ -29,9 +30,17 @@ cli.main(function() {
   var options = this.options;
   var t, w, r;
   try {
-    r = new NLSReader({ baseDir: options.baseDir, bundle: options.bundle });
-    p = new PostProcessor({ referenceLang: options.referenceLang });
-    w = new NLSWriter({ target: options.target });
+    r = new NLSReader({
+      baseDir: options.baseDir,
+      bundle: options.bundle
+    });
+    p = new PostProcessor({
+      referenceLang: options.referenceLang,
+      interactive: options.interactive
+    });
+    w = new NLSWriter({
+      target: options.target
+    });
   } catch (e) {
     console.error(e.toString().red);
     return cli.getUsage(1);
