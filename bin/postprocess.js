@@ -21,7 +21,7 @@ cli.parse({
   baseDir: [ 'd', 'map.apps directory', 'path', '../_map.apps-3.1.0/ct-mapapps-js-api-3.1.0-src' ],
   target: [ 't', 'target directory', 'path', './pp_out' ],
   bundle: [ 'b', 'Bundle name (optional)', 'string', null ],
-  referenceLang: [ null, 'Reference language', 'string', 'en'],
+  referenceLang: [ 'l', 'Reference language', 'string', 'en'],
   interactive: [ 'i', 'Interactivly edit translations' ]
 });
 
