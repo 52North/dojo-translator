@@ -2,10 +2,9 @@
 
 var cli = require('cli');
 var util = require('util');
-
-var NLSReader = require('../lib/nls/reader');
-var NLSWriter = require('../lib/nls/writer');
+var fs = require('fs');
 var Translator = require('../lib/translator');
+var IO = require('../lib/io');
 
 var langs = [
   'bg', 'cs', 'da', 'de',
@@ -18,8 +17,6 @@ var langs = [
 
 cli.enable('help', 'glob');
 cli.parse({
-  baseDir: [ 'd', 'map.apps directory', 'path', '../_map.apps-3.1.0/ct-mapapps-js-api-3.1.0-src' ],
-  target: [ 't', 'target directory', 'path', './out' ],
   bundle: [ 'b', 'Bundle name (optional)', 'string', null ],
   targetLang: [ 'l', 'Target language', 'string', langs.filter(function(x) { return x !== 'en' && x !==  'de'; }) ],
   sourceLang: [ null, 'Source language', 'string', 'en'],
@@ -36,27 +33,32 @@ cli.main(function(args, options) {
         .map(function(x) { return x.trim(); });
   }
 
-  var t, w, r;
+  if (!args || args.length !== 2) cli.getUsage(1);
+  var source = args[0];
+  var target = args[1];
+
+  var t, io;
   try {
-    r = new NLSReader({
-      baseDir: options.baseDir,
+    io = new IO({
+      source: source,
+      target: target,
       bundle: options.bundle
     });
+
+    io.setTargetType(io.getSourceType());
+
     t = new Translator({
       key: options.apikey,
       sourceLang: options.sourceLang,
       noop: options.noop,
       concurrency: options.concurrency
     });
-    w = new NLSWriter({
-      target: options.target
-    });
   } catch (e) {
     console.error(e.toString().red);
     return cli.getUsage(1);
   }
-  r.parse()
+  io.read()
     .then(function(bundles) { return t.translate(bundles, options.targetLang); })
-    .then(function(bundles) { return w.writeBundle(bundles); })
+    .then(function(bundles) { return io.write(bundles); })
     .done();
 });

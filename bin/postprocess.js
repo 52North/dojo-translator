@@ -2,9 +2,7 @@
 
 var cli = require('cli');
 var util = require('util');
-
-var NLSReader = require('../lib/nls/reader');
-var NLSWriter = require('../lib/nls/writer');
+var io = require('../lib/io');
 var PostProcessor = require('../lib/postprocessor');
 
 var langs = [
@@ -18,8 +16,6 @@ var langs = [
 
 cli.enable('help', 'glob');
 cli.parse({
-  baseDir: [ 'd', 'map.apps directory', 'path', '../_map.apps-3.1.0/ct-mapapps-js-api-3.1.0-src' ],
-  target: [ 't', 'target directory', 'path', './pp_out' ],
   bundle: [ 'b', 'Bundle name (optional)', 'string', null ],
   referenceLang: [ 'l', 'Reference language', 'string', 'en'],
   interactive: [ 'i', 'Interactivly edit translations' ]
@@ -27,25 +23,27 @@ cli.parse({
 
 
 cli.main(function(args, options) {
-  var t, w, r;
+  var t, io;
+  if (!args || args.length !== 2) cli.getUsage(1);
+  var source = args[0];
+  var target = args[1];
   try {
-    r = new NLSReader({
-      baseDir: options.baseDir,
+    io = new IO({
+      source: source,
+      target: target,
       bundle: options.bundle
     });
+    io.setTargetType(io.getTargetType());
     p = new PostProcessor({
       referenceLang: options.referenceLang,
       interactive: options.interactive
-    });
-    w = new NLSWriter({
-      target: options.target
     });
   } catch (e) {
     console.error(e.toString().red);
     return cli.getUsage(1);
   }
-  r.parse()
+  io.read()
     .then(function(bundles) { return p.process(bundles); })
-    .then(function(bundles) { return w.writeBundle(bundles); })
+    .then(function(bundles) { return io.write(bundles); })
     .done();
 });
