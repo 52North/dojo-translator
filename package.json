@@ -31,7 +31,7 @@
   },
   "main": "./lib/index.js",
   "bin": {
-    "translator": "./bin/translator.js",
+    "translate": "./bin/translate.js",
     "postprocess": "./bin/postprocess.js",
     "convert": "./bin/convert.js"
   },
