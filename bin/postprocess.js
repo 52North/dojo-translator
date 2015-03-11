@@ -16,9 +16,9 @@ var langs = [
 
 cli.enable('help', 'glob');
 cli.parse({
-  bundle: [ 'b', 'Bundle name (optional)', 'string', null ],
-  referenceLang: [ 'l', 'Reference language', 'string', 'en'],
-  interactive: [ 'i', 'Interactivly edit translations' ]
+  bundle: ['b', 'Bundle name (optional)', 'string', null],
+  referenceLang: ['l', 'Reference language', 'string', 'en'],
+  interactive: ['i', 'Interactivly edit translations']
 });
 
 
@@ -43,7 +43,11 @@ cli.main(function(args, options) {
     return cli.getUsage(1);
   }
   io.read()
-    .then(function(bundles) { return p.process(bundles); })
-    .then(function(bundles) { return io.write(bundles); })
+    .then(function(bundles) {
+      return p.process(bundles);
+    })
+    .then(function(bundles) {
+      return io.write(bundles);
+    })
     .done();
 });

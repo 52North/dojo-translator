@@ -4,9 +4,9 @@
   "description": "map.apps translator",
   "license": "Apache-2.0",
   "homepage": "https://github.com/52North/ec-odp-mapapps",
-  "repository" :  {
-    "type" : "git",
-    "url" : "https://github.com/52North/ec-odp-mapapps.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/52North/ec-odp-mapapps.git"
   },
   "bugs": {
     "url": "https://github.com/52North/ec-odp-mapapps/issues"
@@ -16,13 +16,11 @@
     "github": "https://github.com/autermann",
     "email": "c.autermann@52north.org"
   },
-  "contributors": [
-    {
-      "name": "Christian Autermann",
-      "github": "https://github.com/autermann",
-      "email": "c.autermann@52north.org"
-    }
-  ],
+  "contributors": [{
+    "name": "Christian Autermann",
+    "github": "https://github.com/autermann",
+    "email": "c.autermann@52north.org"
+  }],
   "directories": {
     "doc": "./doc",
     "man": "./man",
