@@ -31,7 +31,8 @@
   "bin": {
     "translate": "./bin/translate.js",
     "postprocess": "./bin/postprocess.js",
-    "convert": "./bin/convert.js"
+    "convert": "./bin/convert.js",
+    "compare": "./bin/compare.js"
   },
   "dependencies": {
     "bluebird": "~2.9.13",
