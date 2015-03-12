@@ -4,12 +4,20 @@ var IO = require('../lib/io');
 var Comparator = require('../lib/comparator');
 var Bluebird = require('bluebird');
 var cli = require('cli');
+var util = require('util');
 
 cli.enable('help', 'glob');
-cli.parse();
+cli.parse({
+  referenceLang: ['l', 'Reference language', 'string', ['en', 'de']]
+});
 
 cli.main(function(args, options) {
   if (!args || args.length !== 2) cli.getUsage(1);
+
+  if (!util.isArray(options.referenceLang)) {
+    options.referenceLang = options.referenceLang.split(',')
+        .map(function (x) { return x.trim(); });
+  }
 
   var io = args.map(function(arg) {
     return new IO({ source: arg, target: arg });
@@ -24,7 +32,9 @@ cli.main(function(args, options) {
   }
 
   function compare(bundleSets) {
-    var c = new Comparator();
+    var c = new Comparator({
+      reference: options.referenceLang
+    });
     return c.run.apply(c, bundleSets);
   }
 
