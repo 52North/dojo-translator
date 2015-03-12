@@ -2,7 +2,7 @@
 
 var cli = require('cli');
 var util = require('util');
-var io = require('../lib/io');
+var IO = require('../lib/io');
 var PostProcessor = require('../lib/postprocessor');
 
 var langs = [
@@ -33,7 +33,7 @@ cli.main(function(args, options) {
       target: target,
       bundle: options.bundle
     });
-    io.setTargetType(io.getTargetType());
+    io.setTargetType(io.getSourceType());
     p = new PostProcessor({
       referenceLang: options.referenceLang,
       interactive: options.interactive
